@@ -41,7 +41,6 @@ API RESTful completa para gerenciamento de tarefas do dia a dia, desenvolvida co
 - [Java 21+](https://adoptium.net/)
 - [Maven 3.6+](https://maven.apache.org/)
 - [PostgreSQL 18+](https://www.postgresql.org/)
-- Git (opcional)
 
 ## 🚀 Como Executar o Projeto
 
