@@ -189,8 +189,9 @@ Fork o projeto
 ### 📄 Licença
 Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
-### 👨‍💻 Autor
-Ellen - Desenvolvedora
+### 👨‍💻 Autores
+Ellen Dias Farias
+Jhonatan Dias Farias
 
 ### 🙏 Agradecimentos
 Spring Boot Team pela excelente framework
