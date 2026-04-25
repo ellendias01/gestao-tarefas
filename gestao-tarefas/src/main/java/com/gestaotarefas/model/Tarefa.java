@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 @Entity
 @Table(name = "tarefa")
 public class Tarefa {
@@ -36,20 +39,47 @@ public class Tarefa {
     
     // Enum de Status
     public enum StatusTarefa {
-        PENDENTE("Pendente"),
-        EM_ANDAMENTO("Em Andamento"),
-        CONCLUIDO("Concluído"),
-        CANCELADO("Cancelado");
-        
-        private String descricao;
-        
-        StatusTarefa(String descricao) {
-            this.descricao = descricao;
+    PENDENTE("Pendente"),
+    EM_ANDAMENTO("Em Andamento"),
+    CONCLUIDO("Concluído"),
+    CANCELADO("Cancelado");
+    
+    private String descricao;
+    
+    StatusTarefa(String descricao) {
+        this.descricao = descricao;
+    }
+    
+    @JsonCreator
+    public static StatusTarefa fromString(String value) {
+    if (value == null) return null;
+    
+    // Se for número, tenta converter
+    try {
+        int codigo = Integer.parseInt(value);
+        for (StatusTarefa status : StatusTarefa.values()) {
+            if (status.ordinal() == codigo) {
+                return status;
+            }
         }
-        
-        public String getDescricao() {
-            return descricao;
+    } catch (NumberFormatException e) {
+        // Não é número, continua com a busca por nome
+    }
+    
+    // Busca por nome ou descrição
+    for (StatusTarefa status : StatusTarefa.values()) {
+        if (status.name().equalsIgnoreCase(value) || 
+            status.getDescricao().equalsIgnoreCase(value)) {
+            return status;
         }
+    }
+    throw new IllegalArgumentException("Status inválido: " + value);
+    }
+    
+    @JsonValue
+    public String getDescricao() {
+        return descricao;
+    }
     }
     
     // Construtores

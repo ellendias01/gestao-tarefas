@@ -2,6 +2,7 @@ package com.gestaotarefas.controller;
 
 import com.gestaotarefas.model.Tarefa;
 import com.gestaotarefas.service.TarefaService;
+import com.gestaotarefas.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -55,9 +56,14 @@ public class TarefaController {
             @Parameter(description = "ID da tarefa", required = true) @PathVariable Long id, 
             @Valid @RequestBody Tarefa tarefa) {
         logger.info("🌐 [API] PUT /tarefas/{} - Recebendo requisição para atualizar", id);
-        Tarefa tarefaAtualizada = tarefaService.atualizarTarefa(id, tarefa);
-        logger.info("🌐 [API] Retornando status 200 OK - Tarefa atualizada");
-        return ResponseEntity.ok(tarefaAtualizada);
+        try {
+            Tarefa tarefaAtualizada = tarefaService.atualizarTarefa(id, tarefa);
+            logger.info("🌐 [API] Retornando status 200 OK - Tarefa atualizada");
+            return ResponseEntity.ok(tarefaAtualizada);
+        } catch (ResourceNotFoundException e) {
+            logger.warn("🌐 [API] Tarefa não encontrada para atualização - ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
     
     @DeleteMapping("/{id}")
@@ -69,9 +75,14 @@ public class TarefaController {
     public ResponseEntity<Void> deletarTarefa(
             @Parameter(description = "ID da tarefa", required = true) @PathVariable Long id) {
         logger.info("🌐 [API] DELETE /tarefas/{} - Recebendo requisição para deletar", id);
-        tarefaService.deletarTarefa(id);
-        logger.info("🌐 [API] Retornando status 204 NO CONTENT - Tarefa deletada");
-        return ResponseEntity.noContent().build();
+        try {
+            tarefaService.deletarTarefa(id);
+            logger.info("🌐 [API] Retornando status 204 NO CONTENT - Tarefa deletada");
+            return ResponseEntity.noContent().build();
+        } catch (ResourceNotFoundException e) {
+            logger.warn("🌐 [API] Tarefa não encontrada para deleção - ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
     
     @GetMapping
@@ -93,24 +104,13 @@ public class TarefaController {
     public ResponseEntity<Tarefa> buscarTarefaPorId(
             @Parameter(description = "ID da tarefa", required = true) @PathVariable Long id) {
         logger.info("🌐 [API] GET /tarefas/{} - Recebendo requisição para buscar", id);
-        Tarefa tarefa = tarefaService.buscarTarefaPorId(id);
-        logger.info("🌐 [API] Retornando status 200 OK - Tarefa encontrada");
-        return ResponseEntity.ok(tarefa);
+        try {
+            Tarefa tarefa = tarefaService.buscarTarefaPorId(id);
+            logger.info("🌐 [API] Retornando status 200 OK - Tarefa encontrada");
+            return ResponseEntity.ok(tarefa);
+        } catch (ResourceNotFoundException e) {
+            logger.warn("🌐 [API] Tarefa não encontrada - ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
-    @CrossOrigin(origins = "*")
-    @Tag(name = "Health Check", description = "Endpoint para verificar status da API")
-    public class HealthController {
-        
-    @GetMapping
-    @Operation(summary = "Verificar saúde da API", description = "Retorna o status da API e conexão com o banco")
-    public ResponseEntity<Map<String, Object>> healthCheck() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "online");
-        response.put("timestamp", System.currentTimeMillis());
-        response.put("message", "API de Gerenciamento de Tarefas funcionando!");
-        response.put("database", "PostgreSQL conectado");
-        response.put("version", "1.0.0");
-        return ResponseEntity.ok(response);
-    }
-}
 }
